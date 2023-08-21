@@ -63,7 +63,7 @@ FROM (
         obs."BloodPressureSystolic",
         obs."BloodPressureDiastolic",
         scd_opt."Name",
-        c."CustomerID"  -- Include the CustomerID in the subquery
+        c."CustomerID" 
 ) AS base_query
 LEFT JOIN (
     SELECT

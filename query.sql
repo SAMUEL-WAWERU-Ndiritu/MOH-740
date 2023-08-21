@@ -32,7 +32,7 @@ FROM (
         MAX(CASE WHEN scd."ColumnName" = 'bloodsugar_fasting' THEN scd_opt."Name" END) AS "BloodSugarFasting",
         MAX(CASE WHEN scd."ColumnName" = 'bloodsugar_random' THEN scd_opt."Name" END) AS "BloodSugarRandom",
         MAX(CASE WHEN scd."ColumnName" = 'HBA1C' THEN scd_opt."Name" END) AS "HBA1C",
-        c."CustomerID"  -- Include the CustomerID in the subquery
+        c."CustomerID"  
     FROM
         hanmakdemo.tblcustomers c
     JOIN

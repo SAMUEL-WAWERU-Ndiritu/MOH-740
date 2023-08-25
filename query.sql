@@ -8,7 +8,7 @@ FROM (
     SELECT
         c."OutPatientNo" AS "PatientNo",
         CONCAT(c."OtherNames", ' ', c."Surname") AS "Name",
-        EXTRACT(YEAR FROM AGE(c."DateOfBirth")) AS "AgeYears",
+        EXTRACT(YEAR FROM AGE(c."DateOfBirth")) AS "Age",
         CASE
             WHEN c."Sex" = 1 THEN 'Male'
             WHEN c."Sex" = 2 THEN 'Female'
@@ -18,8 +18,8 @@ FROM (
             WHEN v."IsRevisit" = 1 THEN 'R'
             ELSE 'F'
         END AS "F-first visit/R-revisit",
-        obs."Weight" AS "WeightKgs",
-        obs."Height" AS "HeightCm",
+        obs."Weight" AS "Weight(Kgs)",
+        obs."Height" AS "Height(M)",
         CASE
             WHEN obs."Height" <> 0 THEN ROUND(obs."Weight" / ((obs."Height" / 100) * (obs."Height" / 100)), 4)
             ELSE NULL
@@ -31,8 +31,7 @@ FROM (
         END AS "HTN",
         MAX(CASE WHEN scd."ColumnName" = 'bloodsugar_fasting' THEN scd_opt."Name" END) AS "BloodSugarFasting",
         MAX(CASE WHEN scd."ColumnName" = 'bloodsugar_random' THEN scd_opt."Name" END) AS "BloodSugarRandom",
-        MAX(CASE WHEN scd."ColumnName" = 'HBA1C' THEN scd_opt."Name" END) AS "HBA1C",
-        c."CustomerID"  
+        MAX(CASE WHEN scd."ColumnName" = 'HBA1C' THEN scd_opt."Name" END) AS "HBA1C"
     FROM
         hanmakdemo.tblcustomers c
     JOIN
@@ -62,16 +61,15 @@ FROM (
         obs."BloodPressureDiastolic",
         obs."BloodPressureSystolic",
         obs."BloodPressureDiastolic",
-        scd_opt."Name",
-        c."CustomerID" 
+        scd_opt."Name"
 ) AS base_query
 LEFT JOIN (
     SELECT
-        cs."CustomerID"
+        DISTINCT cs."CustomerID"
     FROM
         hanmakdemo.tblcustomerschemes cs
     JOIN
         hanmakdemo.tblschemes sch ON cs."SchemeID" = sch."SchemeID"
     WHERE
         sch."Name" ILIKE '%NHIF%'
-) AS nhif_data ON base_query."CustomerID" = nhif_data."CustomerID";
+) AS nhif_data ON base_query."PatientNo"::bigint = nhif_data."CustomerID";
